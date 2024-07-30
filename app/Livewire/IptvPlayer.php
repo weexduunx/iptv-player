@@ -20,7 +20,7 @@ class IptvPlayer extends Component
     public function fetchChannels()
     {
         try {
-            $url = "https://iptv-org.github.io/iptv/index.region.m3u";
+            $url = "https://iptv-org.github.io/iptv/index.m3u";
             $content = file_get_contents($url);
             if ($content === false) {
                 throw new Exception('Unable to download m3u content.');
