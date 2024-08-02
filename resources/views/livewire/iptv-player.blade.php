@@ -65,14 +65,16 @@
                     @foreach ($channels as $channel)
                         <li wire:click="playStream('{{ $channel['url'] }}')" style="cursor: pointer;">
                             <a href="#" class="d-flex gap-4">
-                                {{-- @if ($channel['iconUrl']) --}}
-                                <i class="material-symbols-outlined mat-icon"> home </i>
-                                {{-- <img src="{{ $channel['iconUrl'] }}" alt="{{ $channel['name'] }}" class="img-fluid"
-                                    style="max-width: 50px;"> --}}
-                                {{-- @endif --}}
+                                {{-- <i class="material-symbols-outlined mat-icon"> home </i> --}}
+
+                                {{-- @if ($channel['logoUrl'])
+                                    <img src="{{ $channel['logoUrl'] }}" class="img-fluid" style="max-width: 30px;">
+                                @elseif($channel['iconUrl'])
+                                    <img src="{{ $channel['iconUrl'] }}" alt="{{ $channel['name'] }}" class="img-fluid"
+                                        style="max-width: 30px;">
+                                @endif --}}
                                 <span>{{ $channel['name'] }}</span>
-                                <br>
-                                <small>{{ $channel['tvg_name'] }}</small>
+                                {{-- <small>{{ $channel['tvg_name'] }}</small> --}}
                             </a>
                         </li>
                     @endforeach
@@ -175,7 +177,7 @@
                             </div>
                         </div> --}}
                         {{-- <div class="video-container"> --}}
-                        <div class="embed-responsive video-item embed-responsive-16by9 ">
+                        <div class="embed-responsive video-item embed-responsive-16by9 plyr__video-embed player">
                             <video wire:ignore.self id="player" class="video-js vjs-default-skin" width="600"
                                 height="300" controls></video>
                         </div>
@@ -687,8 +689,12 @@
             });
         });
     </script> --}}
-    <script>
-        document.addEventListener('livewire:init', () => {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/hls.js/0.5.14/hls.js"
+        integrity="sha512-Uxb1LSW1XkMpEWsi4HguYGAHbXnNP5h0On1bBlSOZmEe42ajm2TCVy6khtfr5jFfjlToaG/mrN6R5zslmOCnAg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    {{-- <script src="{{ asset('assets/js/hls.js') }}"></script> --}}
+    {{-- <script>
+        document.addEventListener('livewire:initialized', () => {
             Livewire.on('playStream', url => {
                 var video = document.getElementById('player');
                 var errorMessage = document.getElementById('error-message');
@@ -704,16 +710,13 @@
                 }
 
                 if (Hls.isSupported()) {
-                    var hls = new Hls({
-                        debug: true,
-                        enableWorker: true,
-                        lowLatencyMode: true,
-                        backBufferLength: 90,
-                    });
+                    var hls = new Hls();
 
-                    hls.loadSource(url);
+                    // hls.loadSource(url);
                     hls.attachMedia(video);
-
+                    hls.on(Hls.Events.MEDIA_ATTACHED, () => {
+                        hls.loadSource(url);
+                    });
                     hls.on(Hls.Events.MANIFEST_PARSED, function() {
                         console.log("Manifest parsed. Starting playback.");
                         video.play().catch(error => {
@@ -746,6 +749,23 @@
                             }
                         } else {
                             console.warn("Non-fatal error occurred:", data.details);
+
+                            if (data.details === Hls.ErrorDetails.BUFFER_STALLED_ERROR) {
+                                console.warn("Buffer stalled error, attempting to recover...");
+                                video.play().catch(error => {
+                                    console.error("Playback error while recovering:",
+                                        error);
+                                });
+                            } else if (data.details === Hls.ErrorDetails.FRAG_LOAD_ERROR || data
+                                .details === Hls.ErrorDetails.FRAG_LOAD_TIMEOUT) {
+                                console.warn("Fragment load error, retrying...");
+                                // hls.loadSource(url);
+                                // hls.attachMedia(video);
+                                hls.attachMedia(video);
+                                hls.on(Hls.Events.MEDIA_ATTACHED, () => {
+                                    hls.loadSource(url);
+                                });
+                            }
                         }
                     });
 
@@ -770,5 +790,172 @@
                 }
             });
         });
+    </script> --}}
+    
+    <script>
+        document.addEventListener('livewire:initialized', () => {
+            Livewire.on('playStream', url => {
+                var video = document.getElementById('player');
+                var errorMessage = document.getElementById('error-message');
+    
+                if (!video) {
+                    console.error("Video element not found.");
+                    return;
+                }
+    
+                if (!url) {
+                    console.error("Stream URL is not defined.");
+                    return;
+                }
+    
+                if (Hls.isSupported()) {
+                    var hls = new Hls();
+    
+                    hls.attachMedia(video);
+                    hls.on(Hls.Events.MEDIA_ATTACHED, () => {
+                        hls.loadSource(url);
+                    });
+    
+                    hls.on(Hls.Events.MANIFEST_PARSED, function() {
+                        console.log("Manifest parsed. Starting playback.");
+                        video.play().catch(error => {
+                            console.error("Playback error:", error);
+                            errorMessage.textContent = "Playback error: " + error.message;
+                        });
+                    });
+    
+                    hls.on(Hls.Events.ERROR, function(event, data) {
+                        console.error("Hls.js error:", data);
+    
+                        if (data.fatal) {
+                            switch (data.type) {
+                                case Hls.ErrorTypes.NETWORK_ERROR:
+                                    console.error("Network error:", data.details);
+                                    errorMessage.textContent =
+                                        "Network error encountered. Please check the stream URL.";
+                                    break;
+                                case Hls.ErrorTypes.MEDIA_ERROR:
+                                    console.error("Media error:", data.details);
+                                    errorMessage.textContent =
+                                        "Media error encountered. Attempting to recover...";
+                                    hls.recoverMediaError();
+                                    break;
+                                default:
+                                    console.error("Fatal error:", data.details);
+                                    errorMessage.textContent =
+                                        "A fatal error occurred while loading the stream.";
+                                    break;
+                            }
+                        } else {
+                            console.warn("Non-fatal error occurred:", data.details);
+    
+                            if (data.details === Hls.ErrorDetails.BUFFER_STALLED_ERROR) {
+                                console.warn("Buffer stalled error, attempting to recover...");
+                                video.play().catch(error => {
+                                    console.error("Playback error while recovering:", error);
+                                });
+                            } else if (data.details === Hls.ErrorDetails.FRAG_LOAD_ERROR || 
+                                       data.details === Hls.ErrorDetails.FRAG_LOAD_TIMEOUT) {
+                                console.warn("Fragment load error, retrying...");
+                                hls.attachMedia(video);
+                                hls.on(Hls.Events.MEDIA_ATTACHED, () => {
+                                    hls.loadSource(url);
+                                });
+                            }
+                        }
+                    });
+    
+                    // Additional event listeners to handle buffer and track updates
+                    hls.on(Hls.Events.BUFFER_CREATED, function(eventName, data) {
+                        console.log("Buffer created:", data);
+                    });
+    
+                    hls.on(Hls.Events.BUFFER_RESET, function() {
+                        console.log("Buffer reset");
+                    });
+    
+                    hls.on(Hls.Events.LEVELS_UPDATED, function(eventName, data) {
+                        console.log("Levels updated:", data);
+                    });
+    
+                    hls.on(Hls.Events.LEVEL_SWITCHED, function(eventName, data) {
+                        console.log("Level switched:", data);
+                    });
+    
+                    hls.on(Hls.Events.LEVEL_LOADING, function() {
+                        console.log("Level loading");
+                    });
+    
+                    hls.on(Hls.Events.LEVEL_UPDATED, function(eventName, data) {
+                        console.log("Level updated:", data);
+                    });
+    
+                    hls.on(Hls.Events.AUDIO_TRACKS_UPDATED, function(eventName, data) {
+                        console.log("Audio tracks updated:", data);
+                    });
+    
+                    hls.on(Hls.Events.SUBTITLE_TRACKS_UPDATED, function(eventName, data) {
+                        console.log("Subtitle tracks updated:", data);
+                    });
+    
+                    hls.on(Hls.Events.AUDIO_TRACK_SWITCHED, function(eventName) {
+                        console.log("Audio track switched");
+                    });
+    
+                    hls.on(Hls.Events.SUBTITLE_TRACK_SWITCH, function(eventName) {
+                        console.log("Subtitle track switched");
+                    });
+    
+                    hls.on(Hls.Events.AUDIO_TRACK_LOADED, function(eventName, data) {
+                        console.log("Audio track loaded:", data);
+                    });
+    
+                    hls.on(Hls.Events.SUBTITLE_TRACK_LOADED, function(eventName, data) {
+                        console.log("Subtitle track loaded:", data);
+                    });
+    
+                    hls.on(Hls.Events.LEVEL_PTS_UPDATED, function(eventName, data) {
+                        console.log("Level PTS updated:", data);
+                    });
+    
+                    hls.on(Hls.Events.FRAG_LOADED, function(eventName, data) {
+                        console.log("Fragment loaded:", data);
+                    });
+    
+                    hls.on(Hls.Events.FRAG_PARSING_INIT_SEGMENT, function(eventName, data) {
+                        console.log("Init segment parsed:", data);
+                    });
+    
+                    hls.on(Hls.Events.FRAG_CHANGED, function(eventName, data) {
+                        console.log("Fragment changed:", data);
+                    });
+    
+                    hls.on(Hls.Events.BUFFER_APPENDING, function(eventName, data) {
+                        console.log("Buffer appending:", data);
+                    });
+    
+                    hls.on(Hls.Events.BUFFER_APPENDED, function(eventName, data) {
+                        console.log("Buffer appended:", data);
+                    });
+    
+                    hls.on(Hls.Events.BUFFER_FLUSHED, function(eventName, data) {
+                        console.log("Buffer flushed:", data);
+                    });
+    
+                } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                    video.src = url;
+                    video.addEventListener('canplay', function() {
+                        video.play().catch(error => {
+                            console.error("Playback error:", error);
+                            errorMessage.textContent = "Playback error: " + error.message;
+                        });
+                    });
+                } else {
+                    console.error("HLS is not supported by your browser.");
+                    errorMessage.textContent = "HLS is not supported by your browser.";
+                }
+            });
+        });
     </script>
+    
 @endpush

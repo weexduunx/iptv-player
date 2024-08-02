@@ -16,9 +16,7 @@
     <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}">
     <link href="https://vjs.zencdn.net/6.6.3/video-js.css" rel="stylesheet">
     <script src="https://vjs.zencdn.net/6.6.3/video.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/hls.js/0.5.14/hls.js"
-        integrity="sha512-Uxb1LSW1XkMpEWsi4HguYGAHbXnNP5h0On1bBlSOZmEe42ajm2TCVy6khtfr5jFfjlToaG/mrN6R5zslmOCnAg=="
-        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
     <style>
         .video-container {
             position: sticky;
@@ -57,7 +55,7 @@
         <nav class="navbar navbar-expand-lg p-0">
             <div class="container">
                 <nav class="navbar w-100 navbar-expand-lg justify-content-betweenm">
-                    <a href="index.html" class="navbar-brand">
+                    <a href="/" class="navbar-brand">
                         <img src="assets/images/logo.png" class="logo" alt="logo">
                     </a>
                     <button class="button search-active d-block d-md-none">
@@ -66,29 +64,29 @@
                     <div class="search-form">
                         <form action="#" class="input-area d-flex align-items-center">
                             <i class="material-symbols-outlined mat-icon">search</i>
-                            <input type="text" placeholder="Search Circlehubtio" autocomplete="off">
+                            <input type="text" placeholder="Rechercher une chaîne" autocomplete="off">
                         </form>
                     </div>
                     <ul
                         class="navbar-nav feed flex-row gap-xl-20 gap-lg-10 gap-sm-7 gap-1 py-4 py-lg-0 m-lg-auto ms-auto ms-aut align-self-center">
                         <li>
-                            <a href="index-2.html" class="nav-icon home active"><i
+                            <a href="/" class="nav-icon home active"><i
                                     class="mat-icon fs-xxl material-symbols-outlined mat-icon">home</i></a>
                         </li>
-                        <li>
+                        {{-- <li>
                             <a href="#news-feed" class="nav-icon feed"><i
                                     class="mat-icon fs-xxl material-symbols-outlined mat-icon">feed</i></a>
                         </li>
                         <li>
                             <a href="group.html" class="nav-icon"><i
                                     class="mat-icon fs-xxl material-symbols-outlined mat-icon">group</i></a>
-                        </li>
+                        </li> --}}
                         <li>
                             <a href="/iptv" class="nav-icon"><i
                                     class="mat-icon fs-xxl material-symbols-outlined mat-icon">smart_display</i></a>
                         </li>
                     </ul>
-                    <div class="right-area position-relative d-flex gap-3 gap-xxl-6 align-items-center">
+                    {{-- <div class="right-area position-relative d-flex gap-3 gap-xxl-6 align-items-center">
                         <div class="single-item d-none d-lg-block messages-area">
                             <div class="messages-btn cmn-head">
                                 <div class="icon-area d-center position-relative">
@@ -335,7 +333,7 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </div> --}}
                 </nav>
             </div>
         </nav>
