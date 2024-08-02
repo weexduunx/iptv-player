@@ -26,29 +26,93 @@
 
         <!-- Colonne pour l'affichage de la vidéo -->
         <div class="col-md-8">
-            @if ($currentStream)
-                <div class="embed-responsive embed-responsive-16by9">
-                    <video id="iptv-player" class="embed-responsive-item" controls preload="metadata">
-                        <source src="{{ $currentStream }}" type="application/x-mpegURL">
-                        <track label="English" kind="captions" srclang="en" src="resources/myvideo-en.vtt" default>
-
-                        Votre navigateur ne supporte pas le lecteur de vidéos.
-                    </video>
+            <div class="video-container">
+                <div class="embed-responsive embed-responsive-16by9 ">
+                    {{-- <video id="player" controls></video> --}}
+                    <video wire:ignore.self id="player" class="video-js vjs-default-skin" width="650"
+                        height="350" controls></video>
                 </div>
-            @else
-                <p class="text-center">Sélectionnez une chaîne pour commencer la lecture.</p>
-            @endif
+                <div id="error-message" class="text-danger mt-2"></div>
+            </div>
+
         </div>
     </div>
 </div>
 @push('scripts')
     <script>
         document.addEventListener('livewire:init', () => {
-            Livewire.on('streamUpdated', () => {
-                var player = document.getElementById('iptv-player');
-                if (player) {
-                    player.load();
-                    player.play();
+            Livewire.on('playStream', url => {
+                var video = document.getElementById('player');
+                var errorMessage = document.getElementById('error-message');
+
+                if (!video) {
+                    console.error("Video element not found.");
+                    return;
+                }
+
+                if (!url) {
+                    console.error("Stream URL is not defined.");
+                    return;
+                }
+
+                // const proxyUrl = `/proxy?url=${url}`;
+                // console.log("Proxy URL:", proxyUrl);
+
+                if (Hls.isSupported()) {
+                    var hls = new Hls({
+                        debug: true,
+                        enableWorker: true,
+                        lowLatencyMode: true,
+                        backBufferLength: 90
+                    });
+
+                    hls.loadSource(url);
+                    hls.attachMedia(video);
+
+                    hls.on(Hls.Events.MANIFEST_PARSED, function() {
+                        console.log("Manifest parsed. Starting playback.");
+                        video.play().catch(error => {
+                            console.error("Playback error:", error);
+                            errorMessage.textContent = "Playback error: " + error.message;
+                        });
+                    });
+
+                    hls.on(Hls.Events.ERROR, function(event, data) {
+                        if (data.fatal) {
+                            switch (data.fatal) {
+                                case Hls.ErrorTypes.NETWORK_ERROR:
+                                    console.error("Network error:", data.details);
+                                    errorMessage.textContent =
+                                        "Network error encountered. Please check the stream URL.";
+                                    break;
+                                case Hls.ErrorTypes.MEDIA_ERROR:
+                                    console.error("Media error:", data.details);
+                                    errorMessage.textContent =
+                                        "Media error encountered. The stream might be corrupted.";
+                                    break;
+                                case Hls.ErrorTypes.OTHER_ERROR:
+                                    console.error("Other error:", data.details);
+                                    errorMessage.textContent = "An unknown error occurred.";
+                                    break;
+                                default:
+                                    console.error("Fatal error:", data.details);
+                                    errorMessage.textContent =
+                                        "A fatal error occurred while loading the stream.";
+                                    break;
+                            }
+                        }
+                    });
+                } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                    video.src = url;
+                    video.addEventListener('canplay', function() {
+                        video.play().catch(error => {
+                            console.error("Playback error:", error);
+                            errorMessage.textContent = "Playback error: " + error.message;
+                        });
+                    });
+                } else {
+                    console.error("HLS is not supported by your browser.");
+                    errorMessage.textContent = "HLS is not supported by your browser.";
                 }
             });
         });

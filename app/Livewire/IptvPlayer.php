@@ -17,6 +17,7 @@ class IptvPlayer extends Component
         $this->fetchChannels();
     }
 
+    
     public function fetchChannels()
     {
         try {
@@ -74,8 +75,9 @@ class IptvPlayer extends Component
 
     public function playStream($url)
     {
+        // dd($url);
         $this->currentStream = $url;
-        $this->dispatch('streamUpdated');
+        $this->dispatch('playStream', $url);
     }
 
     public function render()

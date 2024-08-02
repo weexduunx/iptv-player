@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "970bd06a4ca1387450bb06321a87e868",
+    "content-hash": "7e531508a00969abbc9cb162738749db",
     "packages": [
         {
             "name": "brick/math",
@@ -2958,6 +2958,50 @@
                 "source": "https://github.com/bobthecow/psysh/tree/v0.12.4"
             },
             "time": "2024-06-10T01:18:23+00:00"
+        },
+        {
+            "name": "rajurayhan/larastreamer",
+            "version": "v1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/rajurayhan/larastreamer.git",
+                "reference": "2ce1da37754d6c638a6bc21fb812278995bb7ca7"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/rajurayhan/larastreamer/zipball/2ce1da37754d6c638a6bc21fb812278995bb7ca7",
+                "reference": "2ce1da37754d6c638a6bc21fb812278995bb7ca7",
+                "shasum": ""
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Raju\\Streamer\\StreamServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Raju\\Streamer\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Raju Rayhan",
+                    "email": "raju.rayhan@yandex.com"
+                }
+            ],
+            "description": "A laravel package to stream video content.",
+            "support": {
+                "issues": "https://github.com/rajurayhan/larastreamer/issues",
+                "source": "https://github.com/rajurayhan/larastreamer/tree/v1.0.0"
+            },
+            "time": "2019-07-09T04:41:15+00:00"
         },
         {
             "name": "ralouphie/getallheaders",
