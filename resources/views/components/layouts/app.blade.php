@@ -14,9 +14,11 @@
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link rel="shortcut icon" href="{{ asset('assets/images/fav.png') }}" type="image/x-icon">
     <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/hls.js/0.5.52/hls.js"
+        integrity="sha512-RXoyP2bZR8375NSpobokNjhyfqpNuAY7SRy+dwwNdjANTRxgYBnsFV61lXv+6aC8zhLM+RrHPMZY3J0rZyBaFg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <link href="https://vjs.zencdn.net/6.6.3/video-js.css" rel="stylesheet">
     <script src="https://vjs.zencdn.net/6.6.3/video.js"></script>
-
     <style>
         .video-container {
             position: sticky;
@@ -35,7 +37,12 @@
             /* Optionnel : arrière-plan pour le lecteur vidéo */
             color: whitesmoke;
         }
+
+        /* .arrow-open {
+            transform: rotate(90deg);
+        } */
     </style>
+
 </head>
 
 <body>
@@ -769,11 +776,596 @@
     <script src="{{ asset('assets/js/bootstrap.bundle.min.js') }}"></script>
     <script src="{{ asset('assets/js/plugins/slick.js') }}"></script>
     <script src="{{ asset('assets/js/plugins/jquery.nice-select.min.js') }}"></script>
-    <script src="{{ asset('assets/js/plugins/plyr.js') }}"></script>
-    <script src="{{ asset('assets/js/plugins/apexcharts.js') }}"></script>
+    {{-- <script src="{{ asset('assets/js/plugins/plyr.js') }}"></script> --}}
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <script src="{{ asset('assets/js/plugins/wow.min.js') }}"></script>
     <script src="{{ asset('assets/js/plugins/plugin.js') }}"></script>
     <script src="{{ asset('assets/js/main.js') }}"></script>
+    {{-- <script>
+        document.addEventListener('livewire:initialized', () => {
+            Livewire.on('playStream', url => {
+                var video = document.getElementById('player');
+                var errorMessage = document.getElementById('error-message');
+
+                if (!video) {
+                    console.error("Video element not found.");
+                    return;
+                }
+
+                if (!url) {
+                    console.error("Stream URL is not defined.");
+                    return;
+                }
+
+                if (Hls.isSupported()) {
+                    var hls = new Hls({
+                        maxBufferLength: 30,
+                        maxMaxBufferLength: 60,
+                        lowBufferWatchdogPeriod: 0.9,
+                        highBufferWatchdogPeriod: 3,
+                        enableWorker: true,
+                        fragLoadingTimeOut: 30000,
+                        manifestLoadingTimeOut: 30000,
+                        levelLoadingTimeOut: 30000,
+                        startLevel: -1,
+                        capLevelOnFPSDrop: true
+                    });
+
+                    hls.attachMedia(video);
+                    hls.on(Hls.Events.MEDIA_ATTACHED, () => {
+                        hls.loadSource(url);
+                    });
+
+                    hls.on(Hls.Events.MANIFEST_PARSED, function() {
+                        console.log("Manifest parsed. Starting playback.");
+                        video.play().catch(error => {
+                            console.error("Playback error:", error);
+                            errorMessage.textContent = "Playback error: " + error.message;
+                        });
+                    });
+
+                    hls.on(Hls.Events.ERROR, function(event, data) {
+                        console.error("Hls.js error:", data);
+
+                        if (data.fatal) {
+                            switch (data.type) {
+                                case Hls.ErrorTypes.NETWORK_ERROR:
+                                    console.error("Network error:", data.details);
+                                    errorMessage.textContent =
+                                        "Network error encountered. Please check the stream URL.";
+                                    break;
+                                case Hls.ErrorTypes.MEDIA_ERROR:
+                                    console.error("Media error:", data.details);
+                                    errorMessage.textContent =
+                                        "Media error encountered. Attempting to recover...";
+                                    hls.recoverMediaError();
+                                    break;
+                                default:
+                                    console.error("Fatal error:", data.details);
+                                    errorMessage.textContent =
+                                        "A fatal error occurred while loading the stream.";
+                                    hls.destroy();
+                                    break;
+                            }
+                        } else {
+                            console.warn("Non-fatal error occurred:", data.details);
+
+                            if (data.details === Hls.ErrorDetails.BUFFER_STALLED_ERROR) {
+                                console.warn("Buffer stalled error, attempting to recover...");
+                                hls.startLoad(); // Restart the load process
+                                video.play().catch(error => {
+                                    console.error("Playback error while recovering:",
+                                        error);
+                                });
+                            } else if (data.details === Hls.ErrorDetails.FRAG_LOAD_ERROR || data
+                                .details === Hls.ErrorDetails.FRAG_LOAD_TIMEOUT) {
+                                console.warn("Fragment load error, retrying...");
+                                hls.startLoad();
+                            }
+                        }
+                    });
+
+                    hls.on(Hls.Events.FRAG_LOADED, function(event, data) {
+                        console.log("Fragment loaded:", data);
+                    });
+
+                    hls.on(Hls.Events.FRAG_PARSING_INIT_SEGMENT, function(event, data) {
+                        console.log("Init segment parsed:", data);
+                    });
+
+                    hls.on(Hls.Events.BUFFER_RESET, function() {
+                        console.log("Buffer reset");
+                    });
+
+                    hls.on(Hls.Events.LEVEL_LOADING, function() {
+                        console.log("Level loading");
+                    });
+
+                    hls.on(Hls.Events.LEVEL_UPDATED, function(event, data) {
+                        console.log("Level updated:", data);
+                    });
+
+                    hls.on(Hls.Events.LEVEL_PTS_UPDATED, function(event, data) {
+                        console.log("Level PTS updated:", data);
+                    });
+
+                    hls.on(Hls.Events.FRAG_CHANGED, function(event, data) {
+                        console.log("Fragment changed:", data);
+                    });
+
+                    hls.on(Hls.Events.BUFFER_APPENDING, function(event, data) {
+                        console.log("Buffer appending:", data);
+                    });
+
+                    hls.on(Hls.Events.BUFFER_APPENDED, function(event, data) {
+                        console.log("Buffer appended:", data);
+                    });
+                } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                    video.src = url;
+                    video.addEventListener('canplay', function() {
+                        video.play().catch(error => {
+                            console.error("Playback error:", error);
+                            errorMessage.textContent = "Playback error: " + error.message;
+                        });
+                    });
+                } else {
+                    console.error("HLS is not supported by your browser.");
+                    errorMessage.textContent = "HLS is not supported by your browser.";
+                }
+            });
+        });
+    </script> --}}
+    {{-- <script>
+        document.addEventListener('livewire:initialized', () => {
+            let hls = null;
+
+            Livewire.on('playStream', url => {
+                const video = document.getElementById('player');
+                const errorMessage = document.getElementById('error-message');
+
+                if (!video) {
+                    console.error("Video element not found.");
+                    return;
+                }
+
+                if (!url) {
+                    console.error("Stream URL is not defined.");
+                    return;
+                }
+
+                // Clear previous error message
+                errorMessage.textContent = '';
+
+                // Destroy the previous instance of Hls.js if it exists
+                if (hls) {
+                    hls.destroy();
+                    hls = null;
+                }
+
+                if (Hls.isSupported()) {
+                    hls = new Hls({
+                        maxBufferLength: 30,
+                        maxMaxBufferLength: 60,
+                        lowBufferWatchdogPeriod: 0.9,
+                        highBufferWatchdogPeriod: 3,
+                        enableWorker: true,
+                        fragLoadingTimeOut: 30000,
+                        manifestLoadingTimeOut: 30000,
+                        levelLoadingTimeOut: 30000,
+                        startLevel: -1,
+                        capLevelOnFPSDrop: true
+                    });
+
+                    hls.attachMedia(video);
+                    hls.on(Hls.Events.MEDIA_ATTACHED, () => {
+                        hls.loadSource(url);
+                    });
+
+                    hls.on(Hls.Events.MANIFEST_PARSED, function() {
+                        console.log("Manifest parsed. Starting playback.");
+                        video.play().catch(error => {
+                            console.error("Playback error:", error);
+                            errorMessage.textContent = "Playback error: " + error.message;
+                        });
+                    });
+
+                    hls.on(Hls.Events.ERROR, function(event, data) {
+                        console.error("Hls.js error:", data);
+
+                        if (data.fatal) {
+                            switch (data.type) {
+                                case Hls.ErrorTypes.NETWORK_ERROR:
+                                    console.error("Network error:", data.details);
+                                    errorMessage.textContent =
+                                        "Network error encountered. Please check the stream URL.";
+                                    break;
+                                case Hls.ErrorTypes.MEDIA_ERROR:
+                                    console.error("Media error:", data.details);
+                                    errorMessage.textContent =
+                                        "Media error encountered. Attempting to recover...";
+                                    hls.recoverMediaError();
+                                    break;
+                                default:
+                                    console.error("Fatal error:", data.details);
+                                    errorMessage.textContent =
+                                        "A fatal error occurred while loading the stream.";
+                                    hls.destroy();
+                                    break;
+                            }
+                        } else {
+                            console.warn("Non-fatal error occurred:", data.details);
+
+                            if (data.details === Hls.ErrorDetails.BUFFER_STALLED_ERROR) {
+                                console.warn("Buffer stalled error, attempting to recover...");
+                                hls.startLoad(); // Restart the load process
+                                video.play().catch(error => {
+                                    console.error("Playback error while recovering:",
+                                        error);
+                                });
+                            } else if (data.details === Hls.ErrorDetails.FRAG_LOAD_ERROR || data
+                                .details === Hls.ErrorDetails.FRAG_LOAD_TIMEOUT) {
+                                console.warn("Fragment load error, retrying...");
+                                hls.startLoad();
+                            }
+                        }
+                    });
+
+                    hls.on(Hls.Events.FRAG_LOADED, function(event, data) {
+                        console.log("Fragment loaded:", data);
+                    });
+
+                    hls.on(Hls.Events.FRAG_PARSING_INIT_SEGMENT, function(event, data) {
+                        console.log("Init segment parsed:", data);
+                    });
+
+                    hls.on(Hls.Events.BUFFER_RESET, function() {
+                        console.log("Buffer reset");
+                    });
+
+                    hls.on(Hls.Events.LEVEL_LOADING, function() {
+                        console.log("Level loading");
+                    });
+
+                    hls.on(Hls.Events.LEVEL_UPDATED, function(event, data) {
+                        console.log("Level updated:", data);
+                    });
+
+                    hls.on(Hls.Events.LEVEL_PTS_UPDATED, function(event, data) {
+                        console.log("Level PTS updated:", data);
+                    });
+
+                    hls.on(Hls.Events.FRAG_CHANGED, function(event, data) {
+                        console.log("Fragment changed:", data);
+                    });
+
+                    hls.on(Hls.Events.BUFFER_APPENDING, function(event, data) {
+                        console.log("Buffer appending:", data);
+                    });
+
+                    hls.on(Hls.Events.BUFFER_APPENDED, function(event, data) {
+                        console.log("Buffer appended:", data);
+                    });
+                } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                    video.src = url;
+                    video.addEventListener('canplay', function() {
+                        video.play().catch(error => {
+                            console.error("Playback error:", error);
+                            errorMessage.textContent = "Playback error: " + error.message;
+                        });
+                    });
+                } else {
+                    console.error("HLS is not supported by your browser.");
+                    errorMessage.textContent = "HLS is not supported by your browser.";
+                }
+            });
+        });
+    </script> --}}
+    {{-- <script>
+        document.addEventListener('livewire:initialized', () => {
+            let hls = null;
+
+            Livewire.on('playStream', url => {
+                const video = document.getElementById('player');
+                const errorMessage = document.getElementById('error-message');
+
+                if (!video) {
+                    console.error("Video element not found.");
+                    return;
+                }
+
+                if (!url) {
+                    console.error("Stream URL is not defined.");
+                    return;
+                }
+
+                // Clear previous error message
+                errorMessage.textContent = '';
+
+                // Destroy the previous instance of Hls.js if it exists
+                if (hls) {
+                    hls.destroy();
+                    hls = null;
+                }
+
+                if (Hls.isSupported()) {
+                    hls = new Hls({
+                        maxBufferLength: 30,
+                        maxMaxBufferLength: 60,
+                        lowBufferWatchdogPeriod: 0.9,
+                        highBufferWatchdogPeriod: 3,
+                        enableWorker: true,
+                        fragLoadingTimeOut: 30000,
+                        manifestLoadingTimeOut: 30000,
+                        levelLoadingTimeOut: 30000,
+                        startLevel: -1,
+                        capLevelOnFPSDrop: true
+                    });
+
+                    hls.attachMedia(video);
+                    hls.on(Hls.Events.MEDIA_ATTACHED, () => {
+                        hls.loadSource(url);
+                    });
+
+                    hls.on(Hls.Events.MANIFEST_PARSED, function() {
+                        console.log("Manifest parsed. Starting playback.");
+                        video.play().catch(error => {
+                            console.error("Playback error:", error);
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Playback error',
+                                text: error.message
+                            });
+                        });
+                    });
+
+                    hls.on(Hls.Events.ERROR, function(event, data) {
+                        console.error("Hls.js error:", data);
+
+                        if (data.fatal) {
+                            switch (data.type) {
+                                case Hls.ErrorTypes.NETWORK_ERROR:
+                                    console.error("Network error:", data.details);
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Network error',
+                                        text: 'Network error encountered. Please check the stream URL.'
+                                    });
+                                    break;
+                                case Hls.ErrorTypes.MEDIA_ERROR:
+                                    console.error("Media error:", data.details);
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Media error',
+                                        text: 'Media error encountered. Attempting to recover...'
+                                    });
+                                    hls.recoverMediaError();
+                                    break;
+                                default:
+                                    console.error("Fatal error:", data.details);
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Fatal error',
+                                        text: 'A fatal error occurred while loading the stream.'
+                                    });
+                                    hls.destroy();
+                                    break;
+                            }
+                        } else {
+                            console.warn("Non-fatal error occurred:", data.details);
+
+                            if (data.details === Hls.ErrorDetails.BUFFER_STALLED_ERROR) {
+                                console.warn("Buffer stalled error, attempting to recover...");
+                                hls.startLoad(); // Restart the load process
+                                video.play().catch(error => {
+                                    console.error("Playback error while recovering:",
+                                    error);
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Playback error',
+                                        text: error.message
+                                    });
+                                });
+                            } else if (data.details === Hls.ErrorDetails.FRAG_LOAD_ERROR || data
+                                .details === Hls.ErrorDetails.FRAG_LOAD_TIMEOUT) {
+                                console.warn("Fragment load error, retrying...");
+                                hls.startLoad();
+                            }
+                        }
+                    });
+
+                    hls.on(Hls.Events.FRAG_LOADED, function(event, data) {
+                        console.log("Fragment loaded:", data);
+                    });
+
+                    hls.on(Hls.Events.FRAG_PARSING_INIT_SEGMENT, function(event, data) {
+                        console.log("Init segment parsed:", data);
+                    });
+
+                    hls.on(Hls.Events.BUFFER_RESET, function() {
+                        console.log("Buffer reset");
+                    });
+
+                    hls.on(Hls.Events.LEVEL_LOADING, function() {
+                        console.log("Level loading");
+                    });
+
+                    hls.on(Hls.Events.LEVEL_UPDATED, function(event, data) {
+                        console.log("Level updated:", data);
+                    });
+
+                    hls.on(Hls.Events.LEVEL_PTS_UPDATED, function(event, data) {
+                        console.log("Level PTS updated:", data);
+                    });
+
+                    hls.on(Hls.Events.FRAG_CHANGED, function(event, data) {
+                        console.log("Fragment changed:", data);
+                    });
+
+                    hls.on(Hls.Events.BUFFER_APPENDING, function(event, data) {
+                        console.log("Buffer appending:", data);
+                    });
+
+                    hls.on(Hls.Events.BUFFER_APPENDED, function(event, data) {
+                        console.log("Buffer appended:", data);
+                    });
+                } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                    video.src = url;
+                    video.addEventListener('canplay', function() {
+                        video.play().catch(error => {
+                            console.error("Playback error:", error);
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Playback error',
+                                text: error.message
+                            });
+                        });
+                    });
+                } else {
+                    console.error("HLS is not supported by your browser.");
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'HLS not supported',
+                        text: 'HLS is not supported by your browser.'
+                    });
+                }
+            });
+        });
+    </script> --}}
+
+    <script>
+        document.addEventListener('livewire:initialized', () => {
+            let hls = null;
+
+            Livewire.on('playStream', url => {
+                const video = document.getElementById('player');
+                const errorMessage = document.getElementById('error-message');
+
+                if (!video) {
+                    console.error("Video element not found.");
+                    return;
+                }
+
+                if (!url) {
+                    console.error("Stream URL is not defined.");
+                    return;
+                }
+
+                // Clear previous error message
+                errorMessage.textContent = '';
+
+                // Destroy the previous instance of Hls.js if it exists
+                if (hls) {
+                    hls.destroy();
+                    hls = null;
+                }
+
+                if (Hls.isSupported()) {
+                    hls = new Hls();
+                    hls.loadSource(url);
+                    hls.attachMedia(video);
+                    hls.on(Hls.Events.MANIFEST_PARSED, function() {
+                        video.play().catch(error => {
+                            console.error("Playback error:", error);
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Playback error',
+                                text: error.message
+                            });
+                        });
+                    });
+
+                    hls.on(Hls.Events.ERROR, function(event, data) {
+                        console.error("Hls.js error:", data);
+
+                        if (data.fatal) {
+                            switch (data.type) {
+                                case Hls.ErrorTypes.NETWORK_ERROR:
+                                    console.error("Network error:", data.details);
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Network error',
+                                        text: 'Network error encountered. Please check the stream URL.'
+                                    });
+                                    break;
+                                case Hls.ErrorTypes.MEDIA_ERROR:
+                                    console.error("Media error:", data.details);
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Media error',
+                                        text: 'Media error encountered. Attempting to recover...'
+                                    });
+                                    hls.recoverMediaError();
+                                    break;
+                                default:
+                                    console.error("Fatal error:", data.details);
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Fatal error',
+                                        text: 'A fatal error occurred while loading the stream.'
+                                    });
+                                    hls.destroy();
+                                    break;
+                            }
+                        } else {
+                            console.warn("Non-fatal error occurred:", data.details);
+
+                            if (data.details === Hls.ErrorDetails.BUFFER_STALLED_ERROR) {
+                                console.warn("Buffer stalled error, attempting to recover...");
+                                hls.startLoad(); // Restart the load process
+                                video.play().catch(error => {
+                                    console.error("Playback error while recovering:",
+                                        error);
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Playback error',
+                                        text: error.message
+                                    });
+                                });
+                            } else if (data.details === Hls.ErrorDetails.FRAG_LOAD_ERROR || data
+                                .details === Hls.ErrorDetails.FRAG_LOAD_TIMEOUT) {
+                                console.warn("Fragment load error, retrying...");
+                                hls.startLoad();
+                            }
+                        }
+                    });
+                } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                    video.src = url;
+                    video.addEventListener('canplay', function() {
+                        video.play().catch(error => {
+                            console.error("Playback error:", error);
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Playback error',
+                                text: error.message
+                            });
+                        });
+                    });
+                } else {
+                    console.error("HLS is not supported by your browser.");
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'HLS not supported',
+                        text: 'HLS is not supported by your browser.'
+                    });
+                }
+            });
+            // const dropdowns = document.querySelectorAll('.dropdown');
+            // dropdowns.forEach(dropdown => {
+            //     const toggleButton = dropdown.querySelector('.dropdown-btn');
+            //     const arrowIcon = toggleButton.querySelector('.arrow-icon');
+
+            //     toggleButton.addEventListener('click', function() {
+            //         const isOpen = dropdown.classList.toggle('show');
+            //         if (isOpen) {
+            //             arrowIcon.classList.add('arrow-open');
+            //         } else {
+            //             arrowIcon.classList.remove('arrow-open');
+            //         }
+            //     });
+            // });
+        });
+    </script>
     @stack('scripts')
 
 </body>
