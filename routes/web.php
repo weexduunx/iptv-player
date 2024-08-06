@@ -7,7 +7,7 @@ use App\Http\Controllers\StreamController;
 use Illuminate\Support\Facades\Http;
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('accueil');
 });
 Route::get('/iptv', IptvPlayer::class);
 Route::get('/stream/{filename}', [StreamController::class, 'stream'])->name('stream');

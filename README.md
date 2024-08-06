@@ -58,6 +58,6 @@ Les contributions sont les bienvenues ! Veuillez soumettre une demande de tirage
 
 Ce projet est sous la licence MIT. Voir le fichier LICENSE pour plus de détails.
 
-###### Auteurs
+###### Auteur
 
 Idrissa Ndiouck - Software Engineer

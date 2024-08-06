@@ -1,6 +1,134 @@
-<div class="container sidebar-toggler">
+<div class="container">
     <div class="row">
-        <div class="col-xxl-3 col-xl-3 col-lg-4 col-6 cus-z2">
+        <div class="col-xxl-3 col-xl-3 col-lg-4 col-6 mt-5 mt-xl-0">
+            <div class="cus-overflow cus-scrollbar sidebar-head">
+                <div class="d-flex justify-content-end">
+                    <div class="d-block d-xl-none me-4">
+                        <button class="button toggler-btn mb-4 mb-lg-0 d-flex align-items-center gap-2">
+                            <span>My List</span>
+                            <i class="material-symbols-outlined mat-icon"> tune </i>
+                        </button>
+                    </div>
+                </div>
+                <div class="cus-scrollbar side-wrapper">
+                    <div class="sidebar-wrapper d-flex flex-column gap-6">
+                        <div class="sidebar-area p-5">
+                            <div class=" mb-4">
+                                <h5 class="d-inline-flex position-relative">
+                                    Spot
+                                    <span class="mdtxt abs-area d-center position-absolute">2</span>
+                                </h5>
+                            </div>
+                            <div class="d-grid gap-6">
+                                <h6>votre pub ici</h6>
+                            </div>
+                        </div>
+                        <div class="sidebar-area p-5">
+                            <div class="mb-4">
+                                <h5 class="d-inline-flex">
+                                    Spot
+                                </h5>
+                            </div>
+                            <div class="d-flex flex-column gap-6">
+                                <h6>Votre pub ici</h6>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xxl-9 col-xl-9 col-lg-8 col-6 mt-xl-0">
+            <div class="head-area mb-5">
+                <h5>Catégories de chaîne</h5>
+            </div>
+            <div class="popular-area mb-5 d-center flex-wrap gap-3 justify-content-between">
+                <ul class="nav flex-wrap gap-2 tab-area" role="tablist">
+                    @foreach ($channelsByGroup as $group => $channels)
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link d-center @if ($activeGroup === $group) active @endif"
+                                wire:click="setActiveGroup('{{ $group }}')" type="button" role="tab">
+                                {{ $group }}
+                            </button>
+                        </li>
+                    @endforeach
+                </ul>
+                {{-- <div class="btn-item">
+                    <a href="#" class="cmn-btn gap-1">
+                        <i class="material-symbols-outlined mat-icon"> add </i>
+                        Create Group
+                    </a>
+                </div> --}}
+            </div>
+            <div class="tab-content">
+                @foreach ($channelsByGroup as $group => $channels)
+                    <div class="tab-pane fade @if ($activeGroup === $group) show active @endif" role="tabpanel">
+                        <div class="row cus-mar friend-request">
+                            @foreach ($channels as $channel)
+                                <div class="col-xl-4 col-sm-6 col-8">
+                                    <div class="single-box p-5">
+                                        <div class="avatar-box position-relative">
+                                            @php
+                                                $logoUrl = $channel['logoUrl'] ?? asset('assets/images/retrotv.png');
+                                                $logoUrlBg = asset('assets/images/iptv2.jpg');
+                                            @endphp
+                                            <img class="avatar-img w-100" src="{{ $logoUrlBg }}" alt="avatar"
+                                                style="width: 296px; height: 122px"
+                                                onerror="this.onerror=null; this.src='{{ asset('assets/images/iptv2.jpg') }}';">
+                                            <div
+                                                class="abs-area w-100 position-absolute top-0 p-3 d-center justify-content-end">
+                                                <div class="btn-group cus-dropdown dropend">
+                                                    <button type="button" class="dropdown-btn d-center px-2"
+                                                        data-bs-toggle="dropdown" aria-expanded="false">
+                                                        <i class="material-symbols-outlined fs-xxl m-0"> more_horiz
+                                                        </i>
+                                                    </button>
+                                                    <ul class="dropdown-menu p-4 pt-2">
+                                                        <li>
+                                                            <a class="droplist d-flex align-items-center gap-2"
+                                                                href="#">
+                                                                <i class="material-symbols-outlined mat-icon">
+                                                                    person_remove </i>
+                                                                <span>Unfollow</span>
+                                                            </a>
+                                                        </li>
+                                                        <li>
+                                                            <a class="droplist d-flex align-items-center gap-2"
+                                                                href="#">
+                                                                <i class="material-symbols-outlined mat-icon">
+                                                                    hide_source </i>
+                                                                <span>Hide</span>
+                                                            </a>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="abs-avatar-item">
+                                            <img class="avatar-img max-un" src="{{ $logoUrl }}" alt="avatar"
+                                                style="width: 80px; height: 80px"
+                                                onerror="this.onerror=null; this.src='{{ asset('assets/images/retrotv.png') }}';">
+                                        </div>
+                                        <h6 class="m-0 mb-2 mt-3">{{ $channel['name'] }}</h6>
+                                        <div class="d-center btn-border pt-5 gap-2 mt-4">
+
+                                            <button class="cmn-btn fourth"
+                                                wire:click="playStream('{{ $channel['url'] }}', '{{ $channel['logoUrl'] ?? $channel['iconUrl'] }}', '{{ $channel['name'] }}', '{{ $group }}')"
+                                                style="cursor: pointer;">
+                                                <img src="{{ asset('assets/images/icon/live-video.png') }}"
+                                                    class="max-un" alt="icon">
+                                                <span>Regarder</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+
+        {{-- <div class="col-xxl-3 col-xl-3 col-lg-4 col-6 cus-z2">
             <div class="d-inline-block d-lg-none">
                 <button class="button profile-active mb-4 mb-lg-0 d-flex align-items-center gap-2">
                     <i class="material-symbols-outlined mat-icon"> tune </i>
@@ -14,23 +142,13 @@
                     </button>
                 </div>
                 <div class="profile-pic d-flex gap-2 align-items-center">
-                    {{-- <div class="avatar position-relative">
-                        <img class="avatar-img max-un" src="assets/images/avatar-1.png" alt="avatar">
-                    </div> --}}
+                  
                     <div class="text-area">
                         <h6 class="m-0 mb-1"><a href="#">Liste des chaînes par pays</a></h6>
-                        {{-- <p class="mdtxt">@maolio</p> --}}
                     </div>
                 </div>
                 <ul class="profile-link mt-7 mb-7 pb-7">
-                    {{-- @foreach ($channels as $channel)
-                        <li wire:click="playStream('{{ $channel['url'] }}')" style="cursor: pointer;">
-                            <a href="#" class="d-flex gap-4">
-                                <i class="mat-icon fs-xxl material-symbols-outlined mat-icon">smart_display</i>
-                                <span>{{ $channel['name'] }}</span>
-                            </a>
-                        </li>
-                    @endforeach --}}
+        
                     @foreach ($channelsByGroup as $group => $channels)
                         <div class="dropdown">
                             <a href="#"
@@ -58,38 +176,10 @@
                         </div>
                     @endforeach
                 </ul>
-                {{-- <div class="your-shortcuts">
-                    <h6>Your shortcuts</h6>
-                    <ul>
-                        <li>
-                            <a href="public-profile-post.html" class="d-flex align-items-center gap-3">
-                                <img src="assets/images/shortcuts-1.png" alt="icon">
-                                <span>Game Community</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="public-profile-post.html" class="d-flex align-items-center gap-3">
-                                <img src="assets/images/shortcuts-2.png" alt="icon">
-                                <span>Pixel Think (Member)</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="public-profile-post.html" class="d-flex align-items-center gap-3">
-                                <img src="assets/images/shortcuts-3.png" alt="icon">
-                                <span>8 Ball Pool</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="public-profile-post.html" class="d-flex align-items-center gap-3">
-                                <img src="assets/images/shortcuts-4.png" alt="icon">
-                                <span>Gembio</span>
-                            </a>
-                        </li>
-                    </ul>
-                </div> --}}
+
             </div>
-        </div>
-        <div class="col-xxl-9 col-xl-5 col-lg-8 mt-0 mt-lg-10 mt-xl-0 d-flex flex-column gap-7 cus-z">
+        </div> --}}
+        {{-- <div class="col-xxl-9 col-xl-5 col-lg-8 mt-0 mt-lg-10 mt-xl-0 d-flex flex-column gap-7 cus-z">
             <div class="post-item d-flex flex-column gap-5 gap-md-7" id="news-feed">
                 <div class="post-single-box p-3 p-sm-5">
                     <div class="top-area pb-5">
@@ -111,52 +201,9 @@
                                     </div>
                                 @endif
                             </div>
-                            {{-- <div class="btn-group cus-dropdown">
-                                <button type="button" class="dropdown-btn" data-bs-toggle="dropdown"
-                                    aria-expanded="false">
-                                    <i class="material-symbols-outlined fs-xxl m-0"> more_horiz </i>
-                                </button>
-                                <ul class="dropdown-menu p-4 pt-2">
-                                    <li>
-                                        <a class="droplist d-flex align-items-center gap-2" href="#">
-                                            <i class="material-symbols-outlined mat-icon"> bookmark_add </i>
-                                            <span>Saved Post</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a class="droplist d-flex align-items-center gap-2" href="#">
-                                            <i class="material-symbols-outlined mat-icon"> person_remove </i>
-                                            <span>Unfollow</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a class="droplist d-flex align-items-center gap-2" href="#">
-                                            <i class="material-symbols-outlined mat-icon"> hide_source </i>
-                                            <span>Hide Post</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a class="droplist d-flex align-items-center gap-2" href="#">
-                                            <i class="material-symbols-outlined mat-icon"> lock </i>
-                                            <span>Block</span>
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a class="droplist d-flex align-items-center gap-2" href="#">
-                                            <i class="material-symbols-outlined mat-icon"> flag </i>
-                                            <span>Report Post</span>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div> --}}
+                      
                         </div>
-                        {{-- <div class="py-4">
-                            <p class="description">My Travel Video</p>
-                            <p class="hastag d-flex gap-2">
-                                <a href="#">#Viral</a>
-                                <a href="#">#travel</a>
-                            </p>
-                        </div> --}}
+        
                         <div class="embed-responsive video-item embed-responsive-16by9">
                             <video wire:ignore.self id="player" class="video-js vjs-default-skin" width="600"
                                 height="300" controls></video>
@@ -233,352 +280,65 @@
                     </form>
                 </div>
             </div>
-        </div>
-        {{-- <div class="col-xxl-3 col-xl-4 col-lg-4 col-6 mt-5 mt-xl-0">
-            <div class="cus-overflow cus-scrollbar sidebar-head">
-                <div class="d-flex justify-content-end">
-                    <div class="d-block d-xl-none me-4">
-                        <button class="button toggler-btn mb-4 mb-lg-0 d-flex align-items-center gap-2">
-                            <span>My List</span>
-                            <i class="material-symbols-outlined mat-icon"> tune </i>
-                        </button>
-                    </div>
-                </div>
-                <div class="cus-scrollbar side-wrapper">
-                    <div class="sidebar-wrapper d-flex flex-column gap-6">
-                        <div class="sidebar-area p-5">
-                            <div class=" mb-4">
-                                <h6 class="d-inline-flex position-relative">
-                                    Request
-                                    <span class="mdtxt abs-area d-center position-absolute">2</span>
-                                </h6>
-                            </div>
-                            <div class="d-grid gap-6">
-                                <div class="single-single">
-                                    <div class="profile-pic d-flex gap-3 align-items-center">
-                                        <div class="avatar">
-                                            <img class="avatar-img max-un" src="assets/images/avatar-4.png"
-                                                alt="avatar">
-                                        </div>
-                                        <div class="text-area">
-                                            <a href="public-profile-post.html">
-                                                <h6 class="m-0">Lerio Mao</h6>
-                                            </a>
-                                            <div class="friends-list d-flex gap-3 align-items-center text-center">
-                                                <ul class="d-flex align-items-center justify-content-center">
-                                                    <li><img src="assets/images/avatar-2.png" alt="image"></li>
-                                                    <li><img src="assets/images/avatar-3.png" alt="image"></li>
-                                                    <li><img src="assets/images/avatar-4.png" alt="image"></li>
-                                                </ul>
-                                                <span class="mdtxt d-center">10 mutual friends</span>
+        </div> --}}
+
+    </div>
+    <!-- Go Live Popup start -->
+    <div class="go-live-popup">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="modal fade" id="goLiveMod">
+                        <div class="modal-dialog modal-xl">
+                            <div class="modal-content p-5">
+                                <div class="modal-header justify-content-center">
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
+                                </div>
+
+                                <div class="mid-area">
+                                    <div class="post-item d-flex flex-column gap-5 gap-md-7" id="news-feed">
+                                        <div class="post-single-box p-3 p-sm-5">
+                                            <div class="top-area pb-5">
+                                                <div class="profile-area d-center justify-content-between">
+                                                    <div class="avatar-item d-flex gap-3 align-items-center">
+                                                        @if ($currentStream)
+                                                            <div class="avatar position-relative">
+                                                                @if (!empty($currentChannelLogo))
+                                                                    <img class="avatar-img max-un"
+                                                                        src="{{ $currentChannelLogo }}" width="50"
+                                                                        height="50">
+                                                                @else
+                                                                    <img class="avatar-img max-un"
+                                                                        src="{{ asset('assets/images/tv.png') }}"
+                                                                        width="50" height="50">
+                                                                @endif
+                                                            </div>
+                                                            <div class="info-area">
+                                                                <h6 class="m-0"><a
+                                                                        href="#">{{ $currentChannelName }}</a>
+                                                                </h6>
+                                                                <span class="mdtxt status">Live</span>
+                                                            </div>
+                                                        @endif
+                                                    </div>
+
+                                                </div>
+
+                                                <div class="embed-responsive video-item embed-responsive-16by9">
+                                                    <video wire:ignore.self id="player"
+                                                        class="video-js vjs-default-skin" width="600"
+                                                        height="300" controls></video>
+                                                </div>
+                                                <div id="error-message" class="text-danger mt-2"></div>
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="d-flex gap-3 mt-4">
-                                        <button class="cmn-btn">Confirm</button>
-                                        <button class="cmn-btn alt">Delete</button>
-                                    </div>
                                 </div>
-                                <div class="single-single">
-                                    <div class="profile-pic d-flex gap-3 align-items-center">
-                                        <div class="avatar">
-                                            <img class="avatar-img max-un" src="assets/images/avatar-5.png"
-                                                alt="avatar">
-                                        </div>
-                                        <div class="text-area">
-                                            <h6 class="m-0"><a href="public-profile-post.html">Marinez</a></h6>
-                                            <div class="friends-list d-flex gap-3 align-items-center text-center">
-                                                <ul class="d-flex align-items-center justify-content-center">
-                                                    <li><img src="assets/images/avatar-2.png" alt="image"></li>
-                                                    <li><img src="assets/images/avatar-3.png" alt="image"></li>
-                                                    <li><img src="assets/images/avatar-4.png" alt="image"></li>
-                                                </ul>
-                                                <span class="mdtxt d-center">10 mutual friends</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="d-flex gap-3 mt-4">
-                                        <button class="cmn-btn">Confirm</button>
-                                        <button class="cmn-btn alt">Delete</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="sidebar-area p-5">
-                            <div class="mb-4">
-                                <h6 class="d-inline-flex">
-                                    Contact
-                                </h6>
-                            </div>
-                            <div class="d-flex flex-column gap-6">
-                                <div
-                                    class="profile-area d-center position-relative align-items-center justify-content-between">
-                                    <div class="avatar-item d-flex gap-3 align-items-center">
-                                        <div class="avatar-item">
-                                            <img class="avatar-img max-un" src="assets/images/avatar-6.png"
-                                                alt="avatar">
-                                        </div>
-                                        <div class="info-area">
-                                            <h6 class="m-0"><a href="public-profile-post.html"
-                                                    class="mdtxt">Piter Maio</a></h6>
-                                        </div>
-                                    </div>
-                                    <span class="mdtxt abs-area d-center position-absolute end-0">5</span>
-                                </div>
-                                <div class="profile-area d-center justify-content-between">
-                                    <div class="avatar-item d-flex gap-3 align-items-center">
-                                        <div class="avatar-item">
-                                            <img class="avatar-img max-un" src="assets/images/avatar-7.png"
-                                                alt="avatar">
-                                        </div>
-                                        <div class="info-area">
-                                            <h6 class="m-0"><a href="public-profile-post.html"
-                                                    class="mdtxt">Floyd Miles</a></h6>
-                                        </div>
-                                    </div>
-                                    <div class="btn-group cus-dropdown dropend">
-                                        <button type="button" class="dropdown-btn" data-bs-toggle="dropdown"
-                                            aria-expanded="false">
-                                            <i class="material-symbols-outlined fs-xxl m-0"> more_horiz </i>
-                                        </button>
-                                        <ul class="dropdown-menu p-4 pt-2">
-                                            <li>
-                                                <a class="droplist d-flex align-items-center gap-2" href="#">
-                                                    <i class="material-symbols-outlined mat-icon"> person_remove </i>
-                                                    <span>Unfollow</span>
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <a class="droplist d-flex align-items-center gap-2" href="#">
-                                                    <i class="material-symbols-outlined mat-icon"> hide_source </i>
-                                                    <span>Hide Contact</span>
-                                                </a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </div>
-                                <div class="profile-area d-center justify-content-between">
-                                    <div class="avatar-item d-flex gap-3 align-items-center">
-                                        <div class="avatar-item">
-                                            <img class="avatar-img max-un" src="assets/images/avatar-8.png"
-                                                alt="avatar">
-                                        </div>
-                                        <div class="info-area">
-                                            <h6 class="m-0"><a href="public-profile-post.html"
-                                                    class="mdtxt">Darrell Steward</a></h6>
-                                        </div>
-                                    </div>
-                                    <div class="btn-group cus-dropdown dropend">
-                                        <button type="button" class="dropdown-btn" data-bs-toggle="dropdown"
-                                            aria-expanded="false">
-                                            <i class="material-symbols-outlined fs-xxl m-0"> more_horiz </i>
-                                        </button>
-                                        <ul class="dropdown-menu p-4 pt-2">
-                                            <li>
-                                                <a class="droplist d-flex align-items-center gap-2" href="#">
-                                                    <i class="material-symbols-outlined mat-icon"> person_remove </i>
-                                                    <span>Unfollow</span>
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <a class="droplist d-flex align-items-center gap-2" href="#">
-                                                    <i class="material-symbols-outlined mat-icon"> hide_source </i>
-                                                    <span>Hide Contact</span>
-                                                </a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </div>
-                                <div class="profile-area d-center justify-content-between">
-                                    <div class="avatar-item d-flex gap-3 align-items-center">
-                                        <div class="avatar-item">
-                                            <img class="avatar-img max-un" src="assets/images/avatar-2.png"
-                                                alt="avatar">
-                                        </div>
-                                        <div class="info-area">
-                                            <h6 class="m-0"><a href="public-profile-post.html"
-                                                    class="mdtxt">Kristin Watson</a></h6>
-                                        </div>
-                                    </div>
-                                    <div class="btn-group cus-dropdown dropend">
-                                        <button type="button" class="dropdown-btn" data-bs-toggle="dropdown"
-                                            aria-expanded="false">
-                                            <i class="material-symbols-outlined fs-xxl m-0"> more_horiz </i>
-                                        </button>
-                                        <ul class="dropdown-menu p-4 pt-2">
-                                            <li>
-                                                <a class="droplist d-flex align-items-center gap-2" href="#">
-                                                    <i class="material-symbols-outlined mat-icon"> person_remove </i>
-                                                    <span>Unfollow</span>
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <a class="droplist d-flex align-items-center gap-2" href="#">
-                                                    <i class="material-symbols-outlined mat-icon"> hide_source </i>
-                                                    <span>Hide Contact</span>
-                                                </a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </div>
-                                <div class="profile-area d-center justify-content-between">
-                                    <div class="avatar-item d-flex gap-3 align-items-center">
-                                        <div class="avatar-item">
-                                            <img class="avatar-img max-un" src="assets/images/avatar-3.png"
-                                                alt="avatar">
-                                        </div>
-                                        <div class="info-area">
-                                            <h6 class="m-0"><a href="public-profile-post.html" class="mdtxt">Jane
-                                                    Cooper</a></h6>
-                                        </div>
-                                    </div>
-                                    <div class="btn-group cus-dropdown dropend">
-                                        <button type="button" class="dropdown-btn" data-bs-toggle="dropdown"
-                                            aria-expanded="false">
-                                            <i class="material-symbols-outlined fs-xxl m-0"> more_horiz </i>
-                                        </button>
-                                        <ul class="dropdown-menu p-4 pt-2">
-                                            <li>
-                                                <a class="droplist d-flex align-items-center gap-2" href="#">
-                                                    <i class="material-symbols-outlined mat-icon"> person_remove </i>
-                                                    <span>Unfollow</span>
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <a class="droplist d-flex align-items-center gap-2" href="#">
-                                                    <i class="material-symbols-outlined mat-icon"> hide_source </i>
-                                                    <span>Hide Contact</span>
-                                                </a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </div>
-                                <div class="profile-area d-center justify-content-between">
-                                    <div class="avatar-item d-flex gap-3 align-items-center">
-                                        <div class="avatar-item">
-                                            <img class="avatar-img max-un" src="assets/images/avatar-4.png"
-                                                alt="avatar">
-                                        </div>
-                                        <div class="info-area">
-                                            <h6 class="m-0"><a href="public-profile-post.html"
-                                                    class="mdtxt">Devon Lane</a></h6>
-                                        </div>
-                                    </div>
-                                    <div class="btn-group cus-dropdown dropend">
-                                        <button type="button" class="dropdown-btn" data-bs-toggle="dropdown"
-                                            aria-expanded="false">
-                                            <i class="material-symbols-outlined fs-xxl m-0"> more_horiz </i>
-                                        </button>
-                                        <ul class="dropdown-menu p-4 pt-2">
-                                            <li>
-                                                <a class="droplist d-flex align-items-center gap-2" href="#">
-                                                    <i class="material-symbols-outlined mat-icon"> person_remove </i>
-                                                    <span>Unfollow</span>
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <a class="droplist d-flex align-items-center gap-2" href="#">
-                                                    <i class="material-symbols-outlined mat-icon"> hide_source </i>
-                                                    <span>Hide Contact</span>
-                                                </a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </div>
-                                <div class="profile-area d-center justify-content-between">
-                                    <div class="avatar-item d-flex gap-3 align-items-center">
-                                        <div class="avatar-item">
-                                            <img class="avatar-img max-un" src="assets/images/avatar-9.png"
-                                                alt="avatar">
-                                        </div>
-                                        <div class="info-area">
-                                            <h6 class="m-0"><a href="public-profile-post.html"
-                                                    class="mdtxt">Annette Black</a></h6>
-                                        </div>
-                                    </div>
-                                    <div class="btn-group cus-dropdown dropend">
-                                        <button type="button" class="dropdown-btn" data-bs-toggle="dropdown"
-                                            aria-expanded="false">
-                                            <i class="material-symbols-outlined fs-xxl m-0"> more_horiz </i>
-                                        </button>
-                                        <ul class="dropdown-menu p-4 pt-2">
-                                            <li>
-                                                <a class="droplist d-flex align-items-center gap-2" href="#">
-                                                    <i class="material-symbols-outlined mat-icon"> person_remove </i>
-                                                    <span>Unfollow</span>
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <a class="droplist d-flex align-items-center gap-2" href="#">
-                                                    <i class="material-symbols-outlined mat-icon"> hide_source </i>
-                                                    <span>Hide Contact</span>
-                                                </a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </div>
-                                <div class="profile-area d-center justify-content-between">
-                                    <div class="avatar-item d-flex gap-3 align-items-center">
-                                        <div class="avatar-item">
-                                            <img class="avatar-img max-un" src="assets/images/avatar-10.png"
-                                                alt="avatar">
-                                        </div>
-                                        <div class="info-area">
-                                            <h6 class="m-0"><a href="public-profile-post.html"
-                                                    class="mdtxt">Jerome Bell</a></h6>
-                                        </div>
-                                    </div>
-                                    <div class="btn-group cus-dropdown dropend">
-                                        <button type="button" class="dropdown-btn" data-bs-toggle="dropdown"
-                                            aria-expanded="false">
-                                            <i class="material-symbols-outlined fs-xxl m-0"> more_horiz </i>
-                                        </button>
-                                        <ul class="dropdown-menu p-4 pt-2">
-                                            <li>
-                                                <a class="droplist d-flex align-items-center gap-2" href="#">
-                                                    <i class="material-symbols-outlined mat-icon"> person_remove </i>
-                                                    <span>Unfollow</span>
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <a class="droplist d-flex align-items-center gap-2" href="#">
-                                                    <i class="material-symbols-outlined mat-icon"> hide_source </i>
-                                                    <span>Hide Contact</span>
-                                                </a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </div>
-                                <div class="profile-area d-center justify-content-between">
-                                    <div class="avatar-item d-flex gap-3 align-items-center">
-                                        <div class="avatar-item">
-                                            <img class="avatar-img max-un" src="assets/images/avatar-11.png"
-                                                alt="avatar">
-                                        </div>
-                                        <div class="info-area">
-                                            <h6 class="m-0"><a href="public-profile-post.html" class="mdtxt">Guy
-                                                    Hawkins</a></h6>
-                                        </div>
-                                    </div>
-                                    <div class="btn-group cus-dropdown dropend">
-                                        <button type="button" class="dropdown-btn" data-bs-toggle="dropdown"
-                                            aria-expanded="false">
-                                            <i class="material-symbols-outlined fs-xxl m-0"> more_horiz </i>
-                                        </button>
-                                        <ul class="dropdown-menu p-4 pt-2">
-                                            <li>
-                                                <a class="droplist d-flex align-items-center gap-2" href="#">
-                                                    <i class="material-symbols-outlined mat-icon"> person_remove </i>
-                                                    <span>Unfollow</span>
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <a class="droplist d-flex align-items-center gap-2" href="#">
-                                                    <i class="material-symbols-outlined mat-icon"> hide_source </i>
-                                                    <span>Hide Contact</span>
-                                                </a>
-                                            </li>
-                                        </ul>
+                                <div class="footer-area pt-5">
+                                    <div class="btn-area d-flex justify-content-end gap-2">
+                                        <button type="button" class="cmn-btn alt" data-bs-dismiss="modal"
+                                            aria-label="Close">Cancel</button>
                                     </div>
                                 </div>
                             </div>
@@ -586,8 +346,130 @@
                     </div>
                 </div>
             </div>
-        </div> --}}
+        </div>
     </div>
+    <!-- Go Live Popup end -->
 </div>
 @push('scripts')
+    <script>
+        document.addEventListener('livewire:init', () => {
+            let hls = null;
+
+            Livewire.on('playStream', url => {
+                $('#goLiveMod').modal('show');
+                const video = document.getElementById('player');
+                const errorMessage = document.getElementById('error-message');
+
+                if (!video) {
+                    console.error("Video element not found.");
+                    return;
+                }
+
+                if (!url) {
+                    console.error("Stream URL is not defined.");
+                    return;
+                }
+
+                // Clear previous error message
+                errorMessage.textContent = '';
+
+                // Destroy the previous instance of Hls.js if it exists
+                if (hls) {
+                    hls.destroy();
+                    hls = null;
+                }
+
+                if (Hls.isSupported()) {
+                    hls = new Hls();
+                    hls.loadSource(url);
+                    hls.attachMedia(video);
+                    hls.on(Hls.Events.MANIFEST_PARSED, function() {
+                        video.play().catch(error => {
+                            console.error("Playback error:", error);
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Playback error',
+                                text: error.message
+                            });
+                        });
+                    });
+
+                    hls.on(Hls.Events.ERROR, function(event, data) {
+                        console.error("Hls.js error:", data);
+
+                        if (data.fatal) {
+                            switch (data.type) {
+                                case Hls.ErrorTypes.NETWORK_ERROR:
+                                    console.error("Network error:", data.details);
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Network error',
+                                        text: 'Network error encountered. Please check the stream URL.'
+                                    });
+                                    break;
+                                case Hls.ErrorTypes.MEDIA_ERROR:
+                                    console.error("Media error:", data.details);
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Media error',
+                                        text: 'Media error encountered. Attempting to recover...'
+                                    });
+                                    hls.recoverMediaError();
+                                    break;
+                                default:
+                                    console.error("Fatal error:", data.details);
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Fatal error',
+                                        text: 'A fatal error occurred while loading the stream.'
+                                    });
+                                    hls.destroy();
+                                    break;
+                            }
+                        } else {
+                            console.warn("Non-fatal error occurred:", data.details);
+
+                            if (data.details === Hls.ErrorDetails.BUFFER_STALLED_ERROR) {
+                                console.warn("Buffer stalled error, attempting to recover...");
+                                hls.startLoad(); // Restart the load process
+                                video.play().catch(error => {
+                                    console.error("Playback error while recovering:",
+                                        error);
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Playback error',
+                                        text: error.message
+                                    });
+                                });
+                            } else if (data.details === Hls.ErrorDetails.FRAG_LOAD_ERROR || data
+                                .details === Hls.ErrorDetails.FRAG_LOAD_TIMEOUT) {
+                                console.warn("Fragment load error, retrying...");
+                                hls.startLoad();
+                            }
+                        }
+                    });
+                } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                    video.src = url;
+                    video.addEventListener('canplay', function() {
+                        video.play().catch(error => {
+                            console.error("Playback error:", error);
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Playback error',
+                                text: error.message
+                            });
+                        });
+                    });
+                } else {
+                    console.error("HLS is not supported by your browser.");
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'HLS not supported',
+                        text: 'HLS is not supported by your browser.'
+                    });
+                }
+            });
+
+        });
+    </script>
 @endpush

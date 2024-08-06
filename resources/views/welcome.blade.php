@@ -35,7 +35,7 @@
         <nav class="navbar navbar-expand-lg p-0">
             <div class="container">
                 <nav class="navbar w-100 navbar-expand-lg justify-content-betweenm">
-                    <a href="index.html" class="navbar-brand">
+                    <a href="/" class="navbar-brand">
                         <img src="assets/images/logo.png" class="logo" alt="logo">
                     </a>
                     <button class="button search-active d-block d-md-none">
@@ -50,7 +50,7 @@
                     <ul
                         class="navbar-nav feed flex-row gap-xl-20 gap-lg-10 gap-sm-7 gap-1 py-4 py-lg-0 m-lg-auto ms-auto ms-aut align-self-center">
                         <li>
-                            <a href="index-2.html" class="nav-icon home active"><i
+                            <a href="/" class="nav-icon home active"><i
                                     class="mat-icon fs-xxl material-symbols-outlined mat-icon">home</i></a>
                         </li>
                         <li>
@@ -2234,8 +2234,8 @@
         <div class="container">
             <div class="row">
                 <div class="col-lg-8">
-                    <div class="modal cmn-modal fade" id="goLiveMod">
-                        <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal fade" id="goLiveMod">
+                        <div class="modal-dialog modal-dialog-centered modal-lg">
                             <div class="modal-content p-5">
                                 <div class="modal-header justify-content-center">
                                     <button type="button" class="btn-close" data-bs-dismiss="modal"
