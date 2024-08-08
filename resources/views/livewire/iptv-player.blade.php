@@ -16,7 +16,7 @@
 
             <ul class="profile-link mt-7 mb-7 pb-7">
                 {{-- @foreach ($channelsByGroup as $group => $channels) --}}
-                 @foreach(\App\Models\Channel::select('group')->distinct()->get() as $group)
+                @foreach (\App\Models\Channel::select('group')->distinct()->get() as $group)
                     <li>
                         <a href="#{{ $group->group }}"
                             class="d-flex gap-4 @if ($activeGroup === $group->group) active @endif"
@@ -187,13 +187,12 @@
                 </div>
             @else
                 {{-- @foreach ($channelsByGroup as $group => $channels) --}}
-                @foreach(\App\Models\Channel::select('group')->distinct()->get() as $group)
-
+                @foreach (\App\Models\Channel::select('group')->distinct()->get() as $group)
                     <div class="tab-pane fade @if ($activeGroup === $group->group) show active @endif" role="tabpanel">
                         <div class="row cus-mar friend-request">
                             @foreach ($chaines as $channel)
                                 <div class="col-xl-4 col-sm-6 col-8">
-                                    <div class="single-box p-5" wire:key='{{ $channel->xmlTvId}}'>
+                                    <div class="single-box p-5" wire:key='{{ $channel->xmlTvId }}'>
                                         <div class="avatar-box position-relative">
                                             @php
                                                 $logoUrl = $channel->logoUrl ?? asset('assets/images/retrotv.png');
@@ -326,11 +325,9 @@
                                                     </div>
                                                 </div>
 
-                                                <div class="embed-responsive video-item embed-responsive-16by9 ">
-                                                    <video wire:ignore.self id="player"
-                                                        class="video-js vjs-default-skin"
-                                                        style="width: 1080px;height:450px" controls></video>
-                                                </div>
+                                                <video wire:ignore.self id="player"
+                                                    class="video-js vjs-theme-city object-fit-fill border rounded"
+                                                    controls></video>
                                                 <div id="error-message" class="text-danger mt-2"></div>
                                             </div>
                                         </div>

@@ -40,6 +40,11 @@
             /* color: whitesmoke; */
         }
 
+        .video-js {
+            width: 100% !important;
+            height: auto !important;
+        }
+
         /* .arrow-open {
             transform: rotate(90deg);
         } */

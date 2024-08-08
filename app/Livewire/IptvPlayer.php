@@ -18,7 +18,7 @@ class IptvPlayer extends Component
     public $currentChannelName = '';
     public $currentChannelLogo = '';
     public $selectedGroup = '';
-    public $activeGroup = NULL; // Par défaut
+    public $activeGroup = 'Music'; // Par défaut
     public function mount()
     {
         ini_set('memory_limit', '512M');
