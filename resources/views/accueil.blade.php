@@ -1,3 +1,3 @@
 <x-layouts.app>
-    <livewire:iptv-player />
+    <livewire:iptv-player lazy="on-load" />
 </x-layouts.app>
